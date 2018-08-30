@@ -12,8 +12,10 @@ def get_espn_proj(position, slot_cat_id, num_players):
 	ws = wb.create_sheet(position)
 	ws['A1'] = "Player"
 	ws['B1'] = "ESPN_Proj"
+	
+	print("Fetching ESPN Projections for " + str(position))
 
-	player_data = [['' for x in range(2)] for y in range(num_players)]
+	#player_data = [['' for x in range(2)] for y in range(num_players)]
 
 	for player_index in range(0, num_players, 40):
 		page = requests.get("http://games.espn.com/ffl/tools/projections?slotCategoryId=" + str(slot_cat_id) + "&leagueId=728465&startIndex=" + str(player_index))
@@ -23,6 +25,8 @@ def get_espn_proj(position, slot_cat_id, num_players):
 			stop_index = num_players - player_index
 		else:
 			stop_index = 40
+			
+		print("Getting players " + str(player_index) + " through " + str(player_index + stop_index))
 
 		data_long = tree.xpath("//td//text()")
 		data_long = data_long[(data_long.index('PTS')+2):]
@@ -47,19 +51,19 @@ def get_espn_proj(position, slot_cat_id, num_players):
 		for i in range(cat_start, len(data_short), cat_spaces):
 			espn_proj.append(data_short[i])
 			
-		print(players)
-		print(espn_proj)
+		#print(players)
+		#print(espn_proj)
 			
 		for i in range(0, stop_index):
-			print("i: " + str(i))
-			player_data[i + player_index][0] = players[i]
+			#print("i: " + str(i))
+			#player_data[i + player_index][0] = players[i]
 			ws['A' + str(i + player_index + 2)] = players[i]
-			player_data[i + player_index][1] = espn_proj[i]
+			#player_data[i + player_index][1] = espn_proj[i]
 			ws['B' + str(i + player_index + 2)] = float(espn_proj[i])
 
 	#print(players)
 	#print(espn_proj)
-	print(player_data)
+	#print(player_data)
 	wb.save(filename)
 	
 	
@@ -69,4 +73,7 @@ get_espn_proj("WR", 4, 120)
 get_espn_proj("TE", 6, 120)
 get_espn_proj("D_ST", 16, 32)
 get_espn_proj("K", 17, 49)
+
+del wb["Sheet"]
+wb.save(filename)
 
